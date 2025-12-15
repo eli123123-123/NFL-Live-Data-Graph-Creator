@@ -12,13 +12,6 @@ from matplotlib.ticker import MaxNLocator, MultipleLocator
 import os
 STRIPE_SECRET = os.getenv("STRIPE_SECRET", "")
 ODDS_API_KEY = os.getenv("ODDS_API_KEY", "")
-import pandas as pd
-
-def col_or_zero(df: pd.DataFrame, name: str) -> pd.Series:
-    """Return df[name] if it exists, else a zero Series aligned to df.index."""
-    return df[name] if name in df.columns else pd.Series(0, index=df.index)
-
-
 
 # ---------------- constants and helpers ----------------
 
@@ -36,6 +29,10 @@ TEAM_META = {
 st.cache_data.clear()
 st.set_page_config(page_title="NFL Graph Creator", layout="wide")
 
+def col_or(df: pd.DataFrame, name: str, default=0):
+    if name in df.columns:
+        return df[name]
+    return pd.Series(default, index=df.index)
 def normalize_abbr(abbr: str) -> str:
     if not isinstance(abbr, str):
         return ""
@@ -50,15 +47,17 @@ def load_pbp(seasons: list[int]) -> pl.DataFrame:
     """
     pl_df = nfl.load_pbp(seasons=seasons)  # returns Polars
     cols = [
-        "week", "posteam",
-        "pass", "sack", "qb_scramble", "scramble",
-        "pass_attempt", "complete_pass", "yards_gained",
-        "pass_touchdown", "interception",
-        "epa", "cpoe", "air_yards",
-        "play_id",
-        # possible passer id/name variants across seasons/vendors:
-        "passer_id", "passer", "passer_player_id", "passer_player_name",
-    ]
+    "week", "posteam",
+    "pass", "sack", "qb_scramble", "scramble",
+    "pass_attempt", "complete_pass", "rush_attempt",
+    "yards_gained",
+    "pass_touchdown", "interception",
+    "epa", "cpoe", "air_yards",
+    "play_id",
+    "rusher_player_id", "rusher_player_name",
+    "receiver_player_id", "receiver_player_name",
+    "passer_id", "passer", "passer_player_id", "passer_player_name",
+]
     keep = [c for c in cols if c in pl_df.columns]
     return pl_df.select(keep)
 
@@ -88,12 +87,10 @@ def fetch_logo(abbr: str):
     if ab in cache:
         return cache[ab]
     a = ab.lower()
-    urls = [
-        f"https://raw.githubusercontent.com/nflverse/nflfastR-data/master/logos/teams/{a}.png",
-        f"https://raw.githubusercontent.com/nflverse/nflfastR-data/master/logos/{a}.png",
-        f"https://a.espncdn.com/i/teamlogos/nfl/500/{a}.png",
-        f"https://a.espncdn.com/i/teamlogos/nfl/500/transparent/{a}.png",
-    ]
+urls = [
+    f"https://raw.githubusercontent.com/nflverse/nflfastR-data/master/logos/teams/{a}.png",
+    f"https://raw.githubusercontent.com/nflverse/nflfastR-data/master/logos/{a}.png",
+]
     for url in urls:
         try:
             raw = fetch_logo_cached(url)
@@ -240,7 +237,7 @@ def metric_catalog(pos: str):
         vol.insert(1, ("Volume • Dropbacks",           lambda g: g["dropback"].sum()))
     elif pos in ["WR", "TE"]:
         vol.append(("Volume • Targets",                lambda g: ((g["pass_attempt"] == 1) & (g["complete_pass"].isin([0,1]))).sum()))
-        yds.append(("Yardage • YAC per reception",     lambda g: g.loc[g["complete_pass"] == 1, "yards_after_catch"].mean()))
+        yds.append(("Yardage • YAC per reception",     lambda g: g.loc[g["complete_pass"] == 1, col_or(g, "yards_after_catch")].mean()
     elif pos == "RB":
         yds.insert(0, ("Yardage • Yards per rush",     lambda g: g.loc[g["rush_attempt"] == 1, "yards_gained"].mean()))
     elif pos == "K":
@@ -449,6 +446,7 @@ st.pyplot(fig, clear_figure=False)
 
 # Download button
 st.download_button("Download chart PNG", data=png_bytes, file_name="nfl_graph.png", mime="image/png")
+
 
 
 
