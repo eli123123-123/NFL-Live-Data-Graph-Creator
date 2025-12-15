@@ -89,23 +89,20 @@ def fetch_logo(abbr: str):
         return cache[ab]
 
     a = ab.lower()
-urls = [
-        f"https://raw.githubusercontent.com/nflverse/nflfastR-data/master/logos/teams/{a}.png",
-        f"https://raw.githubusercontent.com/nflverse/nflfastR-data/master/logos/{a}.png",
-]
+    urls = [
+        f"...{a}.png",
+        f"...{a}.png",
+    ]
 
-for url in urls:
+    for url in urls:
         try:
-            raw = fetch_logo_cached(url)
-            img = standardize_logo(Image.open(io.BytesIO(raw)), base=100)
-            cache[ab] = img
+            ...
             return img
         except Exception:
             continue
 
     cache[ab] = None
-return None
-
+    return None
 
 def offset_image(x, y, abbr, ax, zoom=0.12):
     img = fetch_logo(abbr)
@@ -451,6 +448,7 @@ st.pyplot(fig, clear_figure=False)
 
 # Download button
 st.download_button("Download chart PNG", data=png_bytes, file_name="nfl_graph.png", mime="image/png")
+
 
 
 
