@@ -237,7 +237,7 @@ def metric_catalog(pos: str):
         vol.insert(1, ("Volume • Dropbacks",           lambda g: g["dropback"].sum()))
     elif pos in ["WR", "TE"]:
         vol.append(("Volume • Targets",                lambda g: ((g["pass_attempt"] == 1) & (g["complete_pass"].isin([0,1]))).sum()))
-        yds.append(("Yardage • YAC per reception",     lambda g: g.loc[g["complete_pass"] == 1, col_or(g, "yards_after_catch")].mean())
+        yds.append(("Yardage • YAC per reception",     lambda g: g.loc[g["complete_pass"] == 1, col_or(g, "yards_after_catch")].mean()))
     elif pos == "RB":
         yds.insert(0, ("Yardage • Yards per rush",     lambda g: g.loc[g["rush_attempt"] == 1, "yards_gained"].mean()))
     elif pos == "K":
@@ -446,6 +446,7 @@ st.pyplot(fig, clear_figure=False)
 
 # Download button
 st.download_button("Download chart PNG", data=png_bytes, file_name="nfl_graph.png", mime="image/png")
+
 
 
 
