@@ -96,7 +96,7 @@ for url in urls:
             raw = fetch_logo_cached(url)
             img = standardize_logo(Image.open(io.BytesIO(raw)), base=100)
             cache[ab] = img
-        return img
+        except img
         except Exception:
             continue
 cache[ab] = None
@@ -446,6 +446,7 @@ st.pyplot(fig, clear_figure=False)
 
 # Download button
 st.download_button("Download chart PNG", data=png_bytes, file_name="nfl_graph.png", mime="image/png")
+
 
 
 
