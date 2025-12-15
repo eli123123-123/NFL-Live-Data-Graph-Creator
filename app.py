@@ -100,7 +100,7 @@ for url in urls:
         except Exception:
             continue
     cache[ab] = None
-    return None
+return None
 
 def offset_image(x, y, abbr, ax, zoom=0.12):
     img = fetch_logo(abbr)
@@ -446,6 +446,7 @@ st.pyplot(fig, clear_figure=False)
 
 # Download button
 st.download_button("Download chart PNG", data=png_bytes, file_name="nfl_graph.png", mime="image/png")
+
 
 
 
