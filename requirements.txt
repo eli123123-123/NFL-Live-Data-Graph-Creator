@@ -1,8 +1,8 @@
-streamlit==1.37.1
-nflreadpy==0.1.5
-polars>=0.20.0
-pandas>=2.0.0
-numpy<2.0
+streamlit>=1.37
+pandas
+numpy
+polars
 matplotlib
 pillow
 requests
+nflreadpy
