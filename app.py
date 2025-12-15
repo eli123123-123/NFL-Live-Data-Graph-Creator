@@ -91,7 +91,7 @@ urls = [
     f"https://raw.githubusercontent.com/nflverse/nflfastR-data/master/logos/teams/{a}.png",
     f"https://raw.githubusercontent.com/nflverse/nflfastR-data/master/logos/{a}.png",
 ]
-    for url in urls:
+for url in urls:
         try:
             raw = fetch_logo_cached(url)
             img = standardize_logo(Image.open(io.BytesIO(raw)), base=100)
@@ -446,6 +446,7 @@ st.pyplot(fig, clear_figure=False)
 
 # Download button
 st.download_button("Download chart PNG", data=png_bytes, file_name="nfl_graph.png", mime="image/png")
+
 
 
 
